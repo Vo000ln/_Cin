@@ -1,0 +1,824 @@
+#include<typeinfo>
+#include<iostream>
+#include<vector>
+#include "checkfloat.h"
+template<class T>
+class _Cin{
+private:
+    std::vector<T> m_data;
+public:
+    _Cin(int c){ 
+
+        bool b(1),minus(0);
+        std::string a,tmp;
+        int count(0);
+        std::string max_int="2147483647",max_short="32767",max_long="9223372036854775807";
+        
+        if(c<=0){   
+
+            std::cout<<"Enter count of elements\n";
+            
+            do{
+                tmp="";
+                b=1;
+
+                getline(std::cin,a);
+
+                if(a.length()!=0){
+
+                    while(a[0]=='0'){
+                        a.erase(0,1);
+                    }
+
+                    for(int i=0;i<a.length();++i){
+                        if(static_cast<int>(a[i])>48&&static_cast<int>(a[i])<=57){
+                            tmp+=a[i];
+                        }
+                        else {
+                            b=0;
+                            break;
+                        }
+                    }
+
+                    if(b&&a.length()!=0){
+                        if(a.length()==10){
+
+                            for(int i=0;i<10;++i){
+                                if(a[i]<max_int[i]){
+                                    break;
+                                }
+                                else if(a[i]>max_int[i]){
+                                    b=0;
+                                    break;
+                                }
+                            }
+
+                        }else if(a.length()>10){
+                            b=0;
+                        }
+                    }
+
+                    if(b&&a.length()!=0){
+                        count=stoi(tmp);
+                    }
+
+                }else if(a.length()>10||a.length()==0){
+                    b=0;
+                }
+
+                if(count==0){
+                    b=0;
+                }
+
+                if(!b){
+                    std::cout<<"Try again\n";
+                }
+
+            }while(!b);
+        }else {
+            count=c;
+        }
+        tmp="";
+
+        if(typeid(m_data)==typeid(std::vector<int>)){
+
+            do{
+
+                getline(std::cin,a);
+
+                if(a.length()!=0){
+
+                    b=1;
+                    minus=0;
+                    tmp="";
+
+                    if(a.length()==1&&a[0]=='0'){}
+                    else {
+
+                        while(a[0]=='0'){
+                            a.erase(0,1);
+                        }
+
+                    }
+
+                    for(int i=0;i<a.length();++i){
+                        if(static_cast<int>(a[i])>=48&&static_cast<int>(a[i])<=57){
+                            tmp+=a[i];
+                        }    
+                        else if(i==0&&static_cast<int>(a[i])==45){
+                            minus=1;b=1;
+                        }
+                        else {
+                            b=0;
+                            break;
+                        }
+                    }
+
+                    if(minus){
+                        a.erase(0,1);
+                    }
+
+                    if(b&&a.length()!=0){
+                        if(a.length()==10&&!minus){
+                            for(int i=0;i<10;++i){
+                                if(a[i]<max_int[i]){
+                                    break;
+                                }
+                                else if(a[i]>max_int[i]){
+                                    b=0;break;
+                                }
+                            }
+                        }else if(a.length()>10){
+                            b=0;
+                        }
+                    }
+
+                    if(tmp=="2147483648"&&minus){
+                        m_data.push_back(-stoi(max_int)-1);
+                    }
+
+                    else if(b&&a.length()!=0){
+
+                        if(minus){
+                            m_data.push_back(-stoi(tmp));
+                        }
+
+                        else {
+                            m_data.push_back(stoi(tmp));
+                        }
+
+                    }
+                }else {
+                    b=0;
+                }
+
+                if(tmp=="2147483648"&&minus){
+                    b=1;
+                }
+
+                if(!b){
+                    std::cout<<"Try again\n";
+                }
+
+            }while(m_data.size()<count);
+        }else if(typeid(m_data)==typeid(std::vector<short>)){
+            
+            do{
+
+                getline(std::cin,a);
+
+                if(a.length()!=0){
+
+                    b=1;
+                    minus=0;
+                    tmp="";
+
+                    if(a.length()==1&&a[0]=='0'){}
+                    else{
+
+                        while(a[0]=='0'){
+                            a.erase(0,1);
+                        }
+
+                    }
+
+                    for(int i=0;i<a.length();++i){
+                        if(static_cast<int>(a[i])>=48&&static_cast<int>(a[i])<=57){
+                            tmp+=a[i];
+                        }
+                        else if(i==0&&static_cast<int>(a[i])==45){
+                            minus=1;b=1;
+                        }
+                        else {
+                            b=0;
+                            break;
+                        }
+                    }
+
+                    if(minus){
+                        a.erase(0,1);
+                    }
+
+                    if(b&&a.length()!=0){
+                        if(a.length()==5){
+                            for(int i=0;i<5;++i){
+                                if(a[i]<max_short[i]){
+                                    break;
+                                }
+                                else if(a[i]>max_short[i]){
+                                    b=0;
+                                    break;
+                                }
+                            }
+                        }else if(a.length()>5){
+                            b=0;
+                        }
+                    }
+
+                    if(tmp=="32768"&&minus){
+                        m_data.push_back(-stoi(max_short)-1);
+                    }
+
+                    else if(b&&a.length()!=0){
+                        if(minus){
+                            m_data.push_back(-stoi(tmp));
+                        }
+                        else {
+                            m_data.push_back(stoi(tmp));
+                        }
+                    }
+
+                }else {
+                    b=0;
+                }
+
+                if(tmp=="32768"&&minus){
+                    b=1;
+                }
+
+                if(!b){
+                    std::cout<<"Try again\n";
+                }
+
+            }while(m_data.size()<count);
+        }else if(typeid(m_data)==typeid(std::vector<long long int>)){
+            
+            do{ 
+
+                getline(std::cin,a);
+
+                if(a.length()!=0){
+
+                    b=1;
+                    minus=0;
+                    tmp="";
+
+                    if(a.length()==1&&a[0]=='0'){}
+                    else {
+
+                        while(a[0]=='0'){
+                            a.erase(0,1);
+                        }
+
+                    }
+
+                    for(int i=0;i<a.length();++i){
+                        if(static_cast<int>(a[i])>=48&&static_cast<int>(a[i])<=57){
+                            tmp+=a[i];
+                        }
+                        else if(i==0&&static_cast<int>(a[i])==45){
+                            minus=1;b=1;
+                        }
+                        else {
+                            b=0;break;
+                        }
+                    }
+                    
+                    if(minus){
+                        a.erase(0,1);
+                    }
+
+                    if(b&&a.length()!=0){
+                        if(a.length()==19){
+                            for(int i=0;i<19;++i){
+                                if(a[i]<max_long[i]){
+                                    break;
+                                }
+                                else if(a[i]>max_long[i]){
+                                    b=0;
+                                    break;
+                                }
+                            }
+                        }else if(a.length()>19){
+                            b=0;
+                        }
+                    }
+
+                    if(tmp=="9223372036854775808"&&minus){
+                        m_data.push_back(-stoll(max_long)-1);
+                    }
+
+                    else if(b&&a.length()!=0){
+                        if(minus){
+                            m_data.push_back(-stoll(tmp));
+                        }
+                        else {
+                            m_data.push_back(stoll(tmp));
+                        }
+                    }
+                }else {
+                    b=0;
+                }
+
+
+                if(tmp=="9223372036854775808"&&!minus){
+                    std::cout<<"Try again\n";
+                }
+
+                if(!b&&tmp!="9223372036854775808"&&!minus){
+                    std::cout<<"Try again\n";
+                }
+
+            }while(m_data.size()<count);
+        }else if(typeid(m_data)==typeid(std::vector<double>)||typeid(m_data)==typeid(std::vector<float>)){
+            
+            bool f=0;
+
+            do{
+
+                b=1;
+                tmp="";
+                a="";
+                f=0;
+
+                getline(std::cin,a);
+
+                if(a.length()==1&&a[0]=='0'||(a.length()==3&&a[0]=='0'&&a[1]=='.'&&a[2]=='0')){
+                    m_data.push_back(stof(a));
+                    b=1;
+                    break;
+                }
+
+                while(a[0]=='0'&&a[1]!='.'){
+                    a.erase(0,1);
+                }
+
+                if(a[0]=='-'){
+                    minus=1;
+                    a.erase(0,1);
+                } 
+
+                if(a.length()!=0){
+                    for(int i=0;i<a.length()&&b;++i){
+                        if(static_cast<int>(a[i])>=48&&static_cast<int>(a[i])<=57){
+                            tmp+=a[i];
+                        }
+                        else if(Isfloat){
+                            tmp+='.';
+                            for(int j=i+1;j<a.length();++j){
+                                if(static_cast<int>(a[j])>=48&&static_cast<int>(a[j])<=57){
+                                    tmp+=a[j];
+                                    if(a.length()==j+1){
+                                        f=1;
+                                    }    
+                                }
+                                else {
+                                    b=0;
+                                    break;
+                                }
+                            }
+                        }else {
+                            b=0;
+                        }
+                        if(f){
+                            break;
+                        }
+                    }
+
+                    if(b){
+
+                        if(typeid(m_data)==typeid(std::vector<double>)){
+                            if(a.length()>15){
+                                b=0;
+                            }
+                        }
+
+                        else if(typeid(m_data)==typeid(std::vector<float>)){
+                            if(a.length()>7){
+                                b=0;
+                            }
+                        }
+
+                    }
+                }else {
+                    b=0;
+                }
+
+                if(!b){
+                    std::cout<<"Try again\n";
+                }
+
+                if(b){
+
+                    if(minus){
+                        if(typeid(m_data)==typeid(std::vector<double>)){
+                            m_data.push_back(-stod(tmp));
+                        }else if(typeid(m_data)==typeid(std::vector<float>)){
+                            m_data.push_back(-stod(tmp));
+                        }
+                    }
+
+                    else if(typeid(m_data)==typeid(std::vector<double>)) {
+                        m_data.push_back(stod(tmp));
+                    }else {
+                        m_data.push_back(stof(tmp));
+                    }
+                }
+            }while(m_data.size()<count);
+        }else{
+            std::cout<<"this type is not supported\n";
+        }
+    }
+    _Cin(int min,int max,int c=1,bool plus=1){
+
+        bool b(1),minus(0);
+        std::string a,tmp;
+        int count(c);
+        std::string max_int="2147483647",max_short="32767",max_long="9223372036854775807";
+
+        if(typeid(m_data)==typeid(std::vector<int>)){
+
+            do{
+
+                getline(std::cin,a);
+
+                if(a.length()!=0){
+
+                    b=1;
+                    minus=0;
+                    tmp="";
+
+                    if(a.length()==1&&a[0]=='0'){}
+                    else {
+
+                        while(a[0]=='0'){
+                            a.erase(0,1);
+                        }
+
+                    }
+
+                    for(int i=0;i<a.length();++i){
+                        if(static_cast<int>(a[i])>=48&&static_cast<int>(a[i])<=57){
+                            tmp+=a[i];
+                        }    
+                        else if(i==0&&static_cast<int>(a[i])==45){
+                            minus=1;b=1;
+                        }
+                        else {
+                            b=0;
+                            break;
+                        }
+                    }
+
+                    if(minus){
+                        a.erase(0,1);
+                    }
+
+                    if(b&&a.length()!=0){
+                        if(a.length()==10&&!minus){
+                            for(int i=0;i<10;++i){
+                                if(a[i]<max_int[i]){
+                                    break;
+                                }
+                                else if(a[i]>max_int[i]){
+                                    b=0;break;
+                                }
+                            }
+                        }else if(a.length()>10){
+                            b=0;
+                        }
+                    }
+
+                    if(b&&plus&&minus){
+                        b=0;
+                    }
+
+                    if(b){
+                        if(stoi(tmp)>=min&&stoi(tmp)<=max){
+                            b=1;
+                        }
+                        else {
+                            b=0;
+                        }
+                    }
+
+                    if(tmp=="2147483648"&&minus){
+                        m_data.push_back(-stoi(max_int)-1);
+                    }
+
+                    else if(b&&a.length()!=0){
+
+                        if(minus){
+                            m_data.push_back(-stoi(tmp));
+                        }
+
+                        else {
+                            m_data.push_back(stoi(tmp));
+                        }
+
+                    }
+                }else {
+                    b=0;
+                }
+
+                if(tmp=="2147483648"&&minus){
+                    b=1;
+                }
+
+                if(!b){
+                    std::cout<<"Try again\n";
+                }
+
+            }while(m_data.size()<count);
+        }else if(typeid(m_data)==typeid(std::vector<short>)){
+            
+            do{
+
+                getline(std::cin,a);
+
+                if(a.length()!=0){
+
+                    b=1;
+                    minus=0;
+                    tmp="";
+
+                    if(a.length()==1&&a[0]=='0'){}
+                    else{
+
+                        while(a[0]=='0'){
+                            a.erase(0,1);
+                        }
+
+                    }
+
+                    for(int i=0;i<a.length();++i){
+                        if(static_cast<int>(a[i])>=48&&static_cast<int>(a[i])<=57){
+                            tmp+=a[i];
+                        }
+                        else if(i==0&&static_cast<int>(a[i])==45){
+                            minus=1;b=1;
+                        }
+                        else {
+                            b=0;
+                            break;
+                        }
+                    }
+
+                    if(minus){
+                        a.erase(0,1);
+                    }
+
+                    if(b&&a.length()!=0){
+                        if(a.length()==5){
+                            for(int i=0;i<5;++i){
+                                if(a[i]<max_short[i]){
+                                    break;
+                                }
+                                else if(a[i]>max_short[i]){
+                                    b=0;
+                                    break;
+                                }
+                            }
+                        }else if(a.length()>5){
+                            b=0;
+                        }
+                    }
+                    
+                    if(b&&stoi(tmp)>=min&&stoi(tmp)<=max){
+                        
+                    }else {
+                        b=0;
+                    }
+
+                    if(b&&plus&&minus){
+                        b=0;
+                    }
+
+                    if(tmp=="32768"&&minus){
+                        m_data.push_back(-stoi(max_short)-1);
+                    }
+
+                    else if(b&&a.length()!=0){
+                        if(minus){
+                            m_data.push_back(-stoi(tmp));
+                        }
+                        else {
+                            m_data.push_back(stoi(tmp));
+                        }
+                    }
+
+                }else {
+                    b=0;
+                }
+
+                if(tmp=="32768"&&minus){
+                    b=1;
+                }
+
+                if(!b){
+                    std::cout<<"Try again\n";
+                }
+
+            }while(m_data.size()<count);
+        }else if(typeid(m_data)==typeid(std::vector<long long int>)){
+            
+            do{ 
+
+                getline(std::cin,a);
+
+                if(a.length()!=0){
+
+                    b=1;
+                    minus=0;
+                    tmp="";
+
+                    if(a.length()==1&&a[0]=='0'){}
+                    else {
+
+                        while(a[0]=='0'){
+                            a.erase(0,1);
+                        }
+
+                    }
+
+                    for(int i=0;i<a.length();++i){
+                        if(static_cast<int>(a[i])>=48&&static_cast<int>(a[i])<=57){
+                            tmp+=a[i];
+                        }
+                        else if(i==0&&static_cast<int>(a[i])==45){
+                            minus=1;b=1;
+                        }
+                        else {
+                            b=0;break;
+                        }
+                    }
+                    
+                    if(minus){
+                        a.erase(0,1);
+                    }
+
+                    if(b&&a.length()!=0){
+                        if(a.length()==19){
+                            for(int i=0;i<19;++i){
+                                if(a[i]<max_long[i]){
+                                    break;
+                                }
+                                else if(a[i]>max_long[i]){
+                                    b=0;
+                                    break;
+                                }
+                            }
+                        }else if(a.length()>19){
+                            b=0;
+                        }
+                    }
+
+                    if(b&&stoi(tmp)>=min&&stoi(tmp)<=max){
+
+                    }else {
+                        b=0;
+                    }
+
+                    if(b&&plus&&minus){
+                        b=0;
+                    }
+
+                    if(tmp=="9223372036854775808"&&minus){
+                        m_data.push_back(-stoll(max_long)-1);
+                    }
+
+                    else if(b&&a.length()!=0){
+                        if(minus){
+                            m_data.push_back(-stoll(tmp));
+                        }
+                        else {
+                            m_data.push_back(stoll(tmp));
+                        }
+                    }
+                }else {
+                    b=0;
+                }
+
+
+                if(tmp=="9223372036854775808"&&!minus){
+                    std::cout<<"Try again\n";
+                }
+
+                if(!b&&tmp!="9223372036854775808"&&!minus){
+                    std::cout<<"Try again\n";
+                }
+
+            }while(m_data.size()<count);
+        }else if(typeid(m_data)==typeid(std::vector<double>)||typeid(m_data)==typeid(std::vector<float>)){
+            
+            bool f=0;
+
+            do{
+
+                b=1;
+                tmp="";
+                a="";
+                f=0;
+
+                getline(std::cin,a);
+
+                if(a.length()==1&&a[0]=='0'||(a.length()==3&&a[0]=='0'&&a[1]=='.'&&a[2]=='0')){
+                    m_data.push_back(stof(a));
+                    b=1;
+                    break;
+                }
+
+                while(a[0]=='0'&&a[1]!='.'){
+                    a.erase(0,1);
+                }
+
+                if(a[0]=='-'){
+                    minus=1;
+                    a.erase(0,1);
+                } 
+
+                if(a.length()!=0){
+                    for(int i=0;i<a.length()&&b;++i){
+                        if(static_cast<int>(a[i])>=48&&static_cast<int>(a[i])<=57){
+                            tmp+=a[i];
+                        }
+                        else if(Isfloat){
+                            tmp+='.';
+                            for(int j=i+1;j<a.length();++j){
+                                if(static_cast<int>(a[j])>=48&&static_cast<int>(a[j])<=57){
+                                    tmp+=a[j];
+                                    if(a.length()==j+1){
+                                        f=1;
+                                    }    
+                                }
+                                else {
+                                    b=0;
+                                    break;
+                                }
+                            }
+                        }else {
+                            b=0;
+                        }
+                        if(f){
+                            break;
+                        }
+                    }
+
+                    if(stod(tmp)>=min&&stod(tmp)<=max){
+
+                    }else {
+                        b=0;
+                    }
+
+                    if(b&&plus&&minus){
+                        b=0;
+                    }
+                    
+                    if(b){
+
+                        if(typeid(m_data)==typeid(std::vector<double>)){
+                            if(a.length()>15){
+                                b=0;
+                            }
+                        }
+
+                        else if(typeid(m_data)==typeid(std::vector<float>)){
+                            if(a.length()>7){
+                                b=0;
+                            }
+                        }
+
+                    }
+                }else {
+                    b=0;
+                }
+
+                if(!b){
+                    std::cout<<"Try again\n";
+                }
+
+                if(b){
+
+                    if(minus){
+                        if(typeid(m_data)==typeid(std::vector<double>)){
+                            m_data.push_back(-stod(tmp));
+                        }else if(typeid(m_data)==typeid(std::vector<float>)){
+                            m_data.push_back(-stod(tmp));
+                        }
+                    }
+
+                    else if(typeid(m_data)==typeid(std::vector<double>)) {
+                        m_data.push_back(stod(tmp));
+                    }else {
+                        m_data.push_back(stof(tmp));
+                    }
+                }
+            }while(m_data.size()<count);
+        }else{
+            std::cout<<"this type is not supported\n";
+        }
+    }
+    void print(){
+        for(auto &v:m_data)std::cout<<v<<' ';
+    }
+
+    std::vector<T>& getvec(){
+        return m_data; 
+    }
+
+    T getvalue(){
+        if(m_data.size()==1){
+            return m_data[0];
+        }
+    }
+};
