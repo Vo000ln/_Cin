@@ -22,6 +22,7 @@ std::string& decreasestr(std::string &a){
 //из строки в число (целочисленное) с проверкой на диапазон
 long long int getnumber(long long min,long long max,std::string &&max_max){        
     std::string tmp,a;bool b(0),minus(0);long long int count(0);
+    assert(max-min>=0&&"max < min ");
     do{
         try{
             getline(std::cin,a);
@@ -106,6 +107,7 @@ long long int getnumber(long long min,long long max,std::string &&max_max){
 //проверка на double но без експоненциальной записи
 double getnumber(double min,double max){        
     std::string tmp,a;bool b(0),minus(0),f(0);double count(0);
+    assert(max-min>=0&&"max < min ");
     do{    
         try{
             b=1;
