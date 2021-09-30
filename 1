@@ -1,9 +1,10 @@
-#ifndef _Cin
-#define _Cin
+#ifndef _Cin_H
+#define _Cin_H
 #include<typeinfo>
 #include<iostream>
 #include<vector>
 #include<cassert>
+#include<limits>
 #include<limits.h>
 #include<float.h>
 #ifndef Isfloat 
@@ -20,9 +21,9 @@ std::string& decreasestr(std::string &a){
     return a; 
 }
 //из строки в число (целочисленное) с проверкой на диапазон
-long long int getnumber(long long min,long long max,std::string &&max_max){        
-    std::string tmp,a;bool b(0),minus(0);long long int count(0);
-    assert(max-min>=0&&"max < min ");
+template<typename T>
+T getnumber(T min,T max){        
+    std::string tmp,a,max_max(std::to_string(std::numeric_limits<decltype(min)>::max()));bool b(0),minus(0);T count(0);
     do{
         try{
             getline(std::cin,a);
@@ -57,8 +58,8 @@ long long int getnumber(long long min,long long max,std::string &&max_max){
                 }
                 //проверка на границы
                 if(b&&a.length()!=0){
-                    if(a.length()==10){
-                        for(int i=0;i<10;++i){
+                    if(a.length()==max_max.length()){
+                        for(int i=0;i<max_max.length();++i){
                             if(a[i]<max_max[i]){
                                 break;
                             }
@@ -68,7 +69,7 @@ long long int getnumber(long long min,long long max,std::string &&max_max){
                                 else throw "too big number\n";
                             }
                         }
-                    }else if(a.length()>10){
+                    }else if(a.length()>max_max.length()){
                         b=0;
                         if(minus)throw "too  small number\n";
                         else throw "too big number\n";
@@ -87,7 +88,7 @@ long long int getnumber(long long min,long long max,std::string &&max_max){
                         if(count<min){b=0;throw "too small number\n";}
                         if(count>max){b=0;throw "too big number\n";}
                     }
-                    else if(b){
+                    else if(b&& a.length()!=0){
                         count=(stoll(tmp));
                         if(count<min){b=0;throw "too small number\n";}
                         if(count>max){b=0;throw "too big number\n";}
@@ -97,6 +98,10 @@ long long int getnumber(long long min,long long max,std::string &&max_max){
                 b=0;
                 throw "you have not entered anything\n";
             }
+            if(b&&minus){
+                b=0;
+                throw "Not right Symbol\n";
+            }
         }
         catch(const char *ex){
             std::cout<<ex<<"Try again\n";
@@ -105,15 +110,15 @@ long long int getnumber(long long min,long long max,std::string &&max_max){
     return count;    
 }
 //проверка на double но без експоненциальной записи
-double getnumber(double min,double max){        
+double getdouble(double min,double max){        
     std::string tmp,a;bool b(0),minus(0),f(0);double count(0);
-    assert(max-min>=0&&"max < min ");
     do{    
         try{
             b=1;
             tmp="";
             a="";
             f=0;
+            
             if(min>max){b=0;exit(1);}
             getline(std::cin,a);
             if(a.length()!=0){
@@ -180,6 +185,10 @@ double getnumber(double min,double max){
                 b=0;
                 throw "you have not entered anything\n"; 
             }
+            if(b&&minus){
+                b=0;
+                throw "Not right Symbol\n";
+            }
         }
         catch(const char* ex){
             std::cout<<ex<<"Try Again\n";
@@ -196,19 +205,19 @@ public:
         std::string max_int="2147483647",max_short="32767",max_long="9223372036854775807";
         if(typeid(m_data)==typeid(std::vector<int>)){
             do{
-                m_data.push_back(getnumber(INT_MIN,INT_MAX,std::string(max_int)));
+                m_data.push_back(getnumber(INT_MIN,INT_MAX));
             }while(m_data.size()<c);
         }else if(typeid(m_data)==typeid(std::vector<short>)){
             do{
-                m_data.push_back(getnumber(SHRT_MIN,SHRT_MAX,std::string(max_short)));
+                m_data.push_back(getnumber(SHRT_MIN,SHRT_MAX));
             }while(m_data.size()<c);
         }else if(typeid(m_data)==typeid(std::vector<double>)||typeid(m_data)==typeid(std::vector<float>)){
             do{
-                m_data.push_back(getnumber(DBL_MIN,DBL_MAX));
+                m_data.push_back(getdouble(DBL_MIN,DBL_MAX));
             }while(m_data.size()<c);
         }else if(typeid(m_data)==typeid(std::vector<long long int>)){
             do{
-                m_data.push_back(getnumber(LLONG_MIN,LLONG_MAX,std::string(max_long)));
+                m_data.push_back(getnumber(LLONG_MIN,LLONG_MAX));
             }while(m_data.size()<c);
         }else{
             std::cout<<"this type is not supported\n";
@@ -221,26 +230,26 @@ public:
             max>INT_MAX?max=INT_MAX:max=max;
             if(plus&&min<0)min=0;
             do{
-                m_data.push_back(getnumber(min,max,std::string(max_int)));
+                m_data.push_back(getnumber(min,max));
             }while(m_data.size()<c);
         }else if(typeid(m_data)==typeid(std::vector<short>)){
             min<SHRT_MIN?min=SHRT_MIN:min=min;
             max>SHRT_MAX?max=SHRT_MAX:max=max;
             if(plus&&min<0)min=0;
             do{
-                m_data.push_back(getnumber(min,max,std::string(max_short)));
+                m_data.push_back(getnumber(min,max));
             }while(m_data.size()<c);
         }else if(typeid(m_data)==typeid(std::vector<double>)||typeid(m_data)==typeid(std::vector<float>)){
             if(plus&&min<0)min=0;
             do{
-                m_data.push_back(getnumber(min,max));
+                m_data.push_back(getdouble(min,max));
             }while(m_data.size()<c);
         }else if(typeid(m_data)==typeid(std::vector<long long int>)){
             min<LLONG_MIN?min=LLONG_MIN:min=min;
             max>LLONG_MAX?max=LLONG_MAX:max=max;
             if(plus&&min<0)min=0;
             do{
-                m_data.push_back(getnumber(min,max,std::string(max_long)));
+                m_data.push_back(getnumber(min,max));
             }while(m_data.size()<c);
         }else{
             std::cout<<"this type is not supported\n";
@@ -253,10 +262,10 @@ public:
     std::vector<T>& getvec(){
         return m_data; 
     }
-
     T getvalue(){
-        assert(m_data.size()==1&&"Size not 1");
-            return m_data[0];
+        return m_data[0];
     }
+    operator std::vector<T>&(){return m_data;}
+    operator T(return m_data[0];)
 };
 #endif
