@@ -1,12 +1,10 @@
 #ifndef _Cin_H
 #define _Cin_H
-#include<typeinfo>
+#include<type_traits>
 #include<iostream>
 #include<vector>
 #include<limits>
-#include<iomanip>
 #include"Myex.h"
-//#define Isfloat i>0&&static_cast<int>(a[i-1])>=48&&static_cast<int>(a[i-1])<=57&&a[i]=='.'&&i<a.length()-1&&(static_cast<int>(a[i+1])>=48&&static_cast<int>(a[i+1])<=57||a[i+1]=='e')
 int _find(const std::string &a,char e){
     int count(0);
     for(int i=0;i<a.length();++i){
@@ -30,7 +28,9 @@ std::string& decreasestr(std::string &a){
 template<typename T>
 T getnumber(T min,T max){        
 
-    std::string tmp,a,max_max(std::to_string(std::numeric_limits<T>::max()));bool b(0),minus(0);T count(0);
+    std::string tmp,a,max_max(std::to_string(std::numeric_limits<T>::max()));
+    bool pass(0),minus(0);
+    T res(0);
     
     if(min>max)return 0;
 
@@ -42,43 +42,41 @@ T getnumber(T min,T max){
 
             if(a.length()!=0){
 
-                b=1;
+                pass=1;
                 minus=0;
                 tmp="";
+
+                //если есть минус
+                if(a[0]=='-'){
+                    minus=1;
+                    a.erase(0,1);
+                    //если только минус
+                    if(a.length()==0){
+                        throw Myexcept("Not right Symbol");
+                    }
+                    //так как макс отр число больше по модулю на 1 увеливаем последнюю цифру на 1
+                    max_max=increasestr(max_max);
+                }
 
                 //Удаляем ведущие нули в начале 
                 if(a.length()==1&&a[0]=='0'){}
                 else {
-                    while(a[0]=='0'){
+                    while(a[0]=='0'&&a.length()>1){
                         a.erase(0,1);
                     }
                 }
-                std::cout<<a<<'\n';
                 //проверка на число
                 for(int i=0;i<a.length();++i){
 
                     if(static_cast<int>(a[i])>=48&&static_cast<int>(a[i])<=57){
                         tmp+=a[i];
-                    }      
-                    //если есть минус
-                    else if(i==0&&static_cast<int>(a[i])==45){
-                        minus=1;
-                        b=1;
+                    }else{
+                        throw Myexcept("Not right symbol");
                     }
-                    else {
-                        b=0;
-                        throw Myexcept("Not right symbol\n");
-                    }
-                }
-                //удаляем минус если отр число
-                if(minus){
-                    a.erase(0,1);
-                    //так как макс отр число больше по модулю на 1 увеливаем последнюю цифру на 1
-                    max_max=increasestr(max_max);
                 }
                 //проверка на границы
-                if(b&&a.length()!=0){
-                    //сравнение строк как чисел. если хоть одно число меньше выходим из цикла 
+                if(pass&&a.length()!=0){
+                    //сравнение строк как чисел. если хоть одно число меньше выходим из цикла так как длины гарантировано равны
                     if(a.length()==max_max.length()){
 
                         for(int i=0;i<max_max.length();++i){
@@ -86,110 +84,110 @@ T getnumber(T min,T max){
                                 break;
                             }
                             else if(a[i]>max_max[i]){
-                                b=0;
-                                if(minus)throw Myexcept("too  small number\n");
-                                else throw Myexcept("too big number\n");
+                                if(minus)throw Myexcept("too  small number");
+                                else throw Myexcept("too big number");
                             }
                         }//если длина больше максимальной для типа
 
                     }else if(a.length()>max_max.length()){
-                        b=0;
-                        if(minus)throw Myexcept("too  small number\n");
-                        else throw Myexcept("too big number\n");
+                        if(minus)throw Myexcept("too  small number");
+                        else throw Myexcept("too big number");
                     }
 
                 }
-                //минус отдельно обрабатывается
+                //если тип беззнаковый и есть минус
+                if(minus&&!std::numeric_limits<T>::is_signed)throw Myexcept("Number cannot be negative");
                 //если число максимально минимальное
                 if(tmp==max_max&&minus){
-                    count=(stoll(max_max)*-1);
-                    b=1;
-                    //if(count<min){b=0;throw Myexcept("too small number\n");}
-                    //if(count>max){b=0;throw Myexcept("too big number\n");}
+                    res=(-stoll(decreasestr(max_max)))-1;
                 }
-                else if(b&&a.length()!=0){
+                else if(pass&&a.length()!=0){
                     if(minus){
-                        count=(-stoll(tmp));
-                        //std::cout<<count<<' '<<min<<'\n';
-                        //if(count<min){b=0;throw Myexcept("too small number\n");}
-                        //if(count>max){b=0;throw Myexcept("too big number\n");}
+                        res=(-stoll(tmp));
                     }
-                    else if(b&& a.length()!=0){
-                        count=(stoll(tmp));
+                    else if(pass&& a.length()!=0){
+                        res=(stoll(tmp));
                     }
                 }
             }else {
-                b=0;
-                throw Myexcept("you have not entered anything\n");
+                throw Myexcept("you have not entered anything");
             }
-            //если только минус
-            if(b&&minus&&a.length()==0){
-                b=0;
-                throw Myexcept("Not right Symbol\n");
+            if(res<min){
+                throw Myexcept("too small number");
             }
-            if(count<min){
-                b=0;
-                throw Myexcept("too small number\n");
-            }
-            if(count>max){
-                b=0;
-                throw Myexcept("too big number\n");
+            if(res>max){
+                throw Myexcept("too big number");
             }
         }
         catch(const std::exception &ex){
-            std::cout<<ex.what()<<"Try again\n";
+            pass=0;
+            std::cout<<ex.what()<<'\n'<<"Try again\n";
+            //чтобы числа не вышли за границы
+            if(minus)decreasestr(max_max);
         }
-    }while(!b);
-    return count;    
+    }while(!pass);
+    return res;    
 }
 //проверка на double с експоненциальной записью
-double getdouble(double min,double max){       
+template<typename T>
+T getdouble(T min,T max){       
 
     std::string tmp,a,check;
-    bool b(0),minus(0),f(0);
-    double count(0);
-    int lentoexp(0);
-
+    bool pass(0),minus(0),f(0),exptopoint(0);
+    T res(0);
+    int lentoexp(0),maxexp,maxlen;
+    //инициализируем maxlen and maxexp от типа данных
+    if(std::is_same<T,double>::value){
+        maxlen=15;
+        maxexp=308;
+    }else if(std::is_same<T,float>::value){
+        maxlen=7;
+        maxexp=38;
+    }else{
+        maxlen=19;
+        maxexp=308;
+    }
     if(min>max)return 0;
 
     do{    
-        try{
-            b=1;
+        try{    
+            pass=1;
             tmp="";
             a="";
             minus=0;
             //f Для проверки с плавающей точкой
             f=0;
-            
+            //проверка была ли e до точки
+            exptopoint=0;
             getline(std::cin,a);
-            //проверка на 0 отдельно
             if(a.length()!=0){
-                /*if(a.length()==1&&a[0]=='0'||(a.length()==3&&a[0]=='0'&&a[1]=='.'&&a[2]=='0')){
-                    count=(stod(a));
-                    if(count<min){b=0;throw Myexcept("too small number\n");}
-                    if(count>max){b=0;throw Myexcept("too big number\n");}
-                    b=1;
-                    //гарантируем что 0 обработается раз 
-                    break;
-                }*/
-                //удаляем все 0 до точки,если точка то не включая перед ней
-                while(a[0]=='0'&&a[1]!='.'&&a.length()>1){
-                    a.erase(0,1);
-                }
+                //удаляем минус
                 if(a[0]=='-'){
                     minus=1;
                     a.erase(0,1);
-                }
-                //проверка на число с плавающей точкой 
-                for(int i=0;i<a.length()&&b;++i){
-                    if(static_cast<int>(a[i])>=48&&static_cast<int>(a[i])<=57){
-                        tmp+=a[i];
+                    //если только минус
+                    if(a.length()==0){
+                        throw Myexcept("Not right Symbol");
                     }
-                    //если пред цифра и сейчас точка и след цифра
-                    else if(i>0&&static_cast<int>(a[i-1])>=48&&static_cast<int>(a[i-1])<=57&&a[i]=='.'&&i<a.length()-1&&(static_cast<int>(a[i+1])>=48&&static_cast<int>(a[i+1])<=57||a[i+1]=='e')){
-                        tmp+='.';
-                        //со след если цифры
-                        if(_find(a,'e')<=1){
+                }
+                //удаляем все 0 до точки,если точка или  e то не включая перед ней
+                while(a[0]=='0'&&a[1]!='.'&&a[1]!='e'&&a.length()>1){
+                    a.erase(0,1);
+                }
+                //проверка на число с плавающей точкой
+                if(_find(a,'e')<=1){ 
+                    for(int i=0;i<a.length()&&pass&&!f;++i){
+                        if(static_cast<int>(a[i])>=48&&static_cast<int>(a[i])<=57){
+                            tmp+=a[i];
+                        }else if(a[i]=='e'){
+                            tmp+=a[i];exptopoint=1;
+                        }else if(a[i-1]=='e'&&i+1<=a.length()-1&&(a[i]=='-'||a[i]=='+')){
+                            tmp+=a[i];
+                        }
+                        //если пред цифра и сейчас точка и след цифра или e
+                        else if(i>0&&a[i]=='.'&&i<a.length()-1&&!exptopoint){
+                            tmp+='.';
+                            //со след если цифры
                             for(int j=i+1;j<a.length();++j){
                                 if(static_cast<int>(a[j])>=48&&static_cast<int>(a[j])<=57){
                                     tmp+=a[j];
@@ -199,74 +197,71 @@ double getdouble(double min,double max){
                                     }//проверка на е
                                 }else if(a[j]=='e'){
                                     tmp+=a[j];           
-                                }else if((a[j-1]=='e'&&j+1<a.length()-1)&&(a[j]=='-'||a[j]=='+')){
+                                }else if((a[j-1]=='e'&&j+1<=a.length()-1)&&(a[j]=='-'||a[j]=='+')){
                                     tmp+=a[j];
                                 }else{
-                                    throw Myexcept("Not right symbol\n");
+                                    //std::cout<<a[j]<<' '<<a[j-1]<<' '<<j+1<<' '<<a.length()-1<<'\n';
+                                    throw Myexcept("Not right symbol");
                                 }
                             }
                         }else {
-                            throw Myexcept("Not right symbol\n");       
-                        }
-                    }else {
-                        throw Myexcept("Not right symbol\n");
+                            throw Myexcept("Not right symbol");
+                        }//чтобы выйти из основного цикла
                     }
-                    if(f){
-                        break;
-                    }
+                }else throw Myexcept("Not right symbol");
+                if(a.length()>maxlen){
+                    if(minus)throw Myexcept("too small or long number");
+                    throw Myexcept("too big or long number");
                 }
-                if(b){
-                    if(a.length()>15){
-                        if(minus)throw Myexcept("too small or long number\n");
-                        throw Myexcept("too big or long number\n");
-                    }
-                    //если только минусы
-                    if(minus&&a.length()==0){
-                        throw Myexcept("Not right Symbol\n");
-                    }
-                    //если есть ешка
-                    if(_find(a,'e')==1){
-                        //проверка е на степень string для этого
-                        //получим количество цифр до точки чтобы подправить макс степень e
-                        check="";
+                //если есть ешка
+                if(_find(a,'e')==1){
+                    //проверка е на степень string для этого
+                    //получим количество цифр до точки или до e чтобы подправить макс степень e
+                    check="";
+                    if(!exptopoint){
                         lentoexp=a.substr(0,a.find('.')).length();
                         for(int i=0;i<a.length();++i){
-                            if(a[i]=='e')for(int j=i+1;j<a.length();++j)check+=a[j];
+                            if(a[i]=='e'){for(int j=i+1;j<a.length();++j)check+=a[j];break;}
                         }
+                    }else {
+                        lentoexp=a.substr(0,a.find('e')).length();
+                        for(int i=0;i<a.length();++i){
+                            if(a[i]=='e'){for(int j=i+1;j<a.length();++j)check+=a[j];break;}
+                        }
+                    }
+                    //чтобы после е что то было
+                    if(check.length()==0){
+                        throw Myexcept("Not right symbol");
+                    }
+                    //если срез от начала строки до е  не равен в числе нулю
+                    if(stoll(a.substr(0,'e'))!=0){
                         //-1 чтобы макс степень была на 1 меньше чем возможная
-                        if(stoll(check)>(308-lentoexp-1)){
-                            throw Myexcept("too big number\n");
-                        }else if(stoll(check)<(-308-lentoexp+1)||(minus&&abs(stoll(check))<(308-lentoexp-1))){
-                            throw Myexcept("too small number\n");
+                        if(stoll(check)>(maxexp-lentoexp)){
+                            throw Myexcept("too big number");
+                        }else if(-stoll(check)>(maxexp+lentoexp-2)){
+                            throw Myexcept("too small number");
                         }
                     }
                 }
-                if(b){
-                    // из строки в число если с минусом
-                    if(minus){
-                        count=(-stod(tmp));
-                        //std::cout<<"count "<<count<<" "<<min<<'\n';
-                        //if(count<min){throw Myexcept("too small number\n");}
-                        //if(count>max){throw Myexcept("too big number\n");}
-                    }// без минуса
-                    else{
-                        count=stod(tmp);
-                        //if(count<min){throw Myexcept("too small number\n");}
-                        //if(count>max){throw Myexcept("too big number\n");}
-                    }
+                // из строки в число если с минусом
+                if(minus){
+                    res=(-stold(tmp));
+                }// без минуса
+                else{
+                    res=stold(tmp);
                 }
             }else{
-                throw Myexcept("you have not entered anything\n"); 
+                throw Myexcept("you have not entered anything"); 
             }
-            if(count<min){throw Myexcept("too small number\n");}
-            if(count>max){throw Myexcept("too big number\n");}
+            if(res<min){throw Myexcept("too small number");}
+            if(res>max){throw Myexcept("too big number");}
         }
         catch(const std::exception& ex){
             std::cout<<ex.what()<<'\n'<<"Try Again\n";
-            b=0;
+            pass=0;
         }
-    }while(!b);
-    return count;    
+    }while(!pass);
+    return res;    
 }
 
 template<class T>
@@ -274,37 +269,46 @@ class _Cin{
 private:
     std::vector<T> m_data;
 public:
+    //конструктор без задаваемых границ
     _Cin(int c=1){ 
-        if(typeid(m_data)==typeid(std::vector<int>)||typeid(m_data)==typeid(std::vector<short>)||typeid(m_data)==typeid(std::vector<long long int>)){
+        //только целочисленные
+        if(std::numeric_limits<T>::is_integer){
             do{
                 m_data.push_back(getnumber(std::numeric_limits<T>::lowest(),std::numeric_limits<T>::max()));
             }while(m_data.size()<c);
-        }else if(typeid(m_data)==typeid(std::vector<double>)){
+            //если с плавающей точкой
+        }else if(std::is_floating_point<T>::value){
             do{
-                //lowest так как мин возвращает полож число минимальное 
                 m_data.push_back(getdouble(std::numeric_limits<T>::lowest(),std::numeric_limits<T>::max()));
             }while(m_data.size()<c);
         }else{
-            std::cout<<"this type is not supported\n";
+            throw Myexcept("template argument is invalid");
         }
-    }  
-    _Cin(T min,T max,int c=1){
-        if(typeid(m_data)==typeid(std::vector<int>)){
-            min<std::numeric_limits<T>::min()?min=std::numeric_limits<T>::min():min=min;
-            max>std::numeric_limits<T>::max()?max=std::numeric_limits<T>::max():max=max; 
+    }
+    //конструктор с задаваемыми границами
+    _Cin(T min,T max,int c=1){ 
+        //если целочисленное
+        if(std::numeric_limits<T>::is_integer){
+            if(min<std::numeric_limits<T>::lowest()){
+                min=std::numeric_limits<T>::min();
+            }
+            if(max>std::numeric_limits<T>::max()){
+                max=std::numeric_limits<T>::max();
+            }
             do{
                 m_data.push_back(getnumber(min,max));
             }while(m_data.size()<c);
-        }else if(typeid(m_data)==typeid(std::vector<double>)){
+            //если с плавающей запятой
+        }else if(std::is_floating_point<T>::value){
             do{
                 m_data.push_back(getdouble(min,max));
             }while(m_data.size()<c);
         }else{
-            std::cout<<"this type is not supported\n";
+            throw Myexcept("template argument is invalid");
         }
     }
     void print(){
-        for(auto &v:m_data)std::cout<<v<<' ';
+        for(const auto &v:m_data)std::cout<<v<<' ';
     }
     std::vector<T>& getvec(){
         return m_data; 
@@ -312,6 +316,7 @@ public:
     T getvalue(){
         return m_data[0];
     }
+    //перегрузка в вектор и в число
     operator std::vector<T>&(){return m_data;}
     operator T(){return m_data[0];}
 };
